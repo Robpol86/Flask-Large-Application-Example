@@ -25,28 +25,40 @@ Command details:
 Usage:
     manage.py devserver [-p NUM] [-l DIR] [--config_prod]
     manage.py tornadoserver [-p NUM] [-l DIR] [--config_prod]
-    manage.py celery [-l DIR] [--config_prod]
+    manage.py celerydev [-l DIR] [--config_prod]
+    manage.py celerybeat [-l DIR] [--config_prod]
+    manage.py celeryworker [-l DIR] [--config_prod]
     manage.py shell [--config_prod]
     manage.py create_all [--config_prod]
     manage.py (-h | --help)
 
 Options:
-    --config_prod           Load the production configuration instead of development.
-    -l DIR --log_dir=DIR    Log all statements to file in this directory instead of stdout.
-                            Only ERROR statements will go to stdout. stderr is not used.
-    -p NUM --port=NUM       Flask will listen on this port number [default: 5000].
+    --config_prod           Load the production configuration instead of
+                            development.
+    -l DIR --log_dir=DIR    Log all statements to file in this directory
+                            instead of stdout.
+                            Only ERROR statements will go to stdout. stderr is
+                            not used.
+    -p NUM --port=NUM       Flask will listen on this port number.
+                            [default: 5000]
 """
 
 from __future__ import print_function
+from functools import wraps
 import logging
 import os
 import signal
 import sys
 
+from celery.app.log import Logging
+from celery.bin.celery import main as celery_main
 from docopt import docopt
 import flask
+from flask.ext.script import Shell
+from tornado import httpserver, ioloop, web, wsgi
 
 from pypi_portal.application import create_app, get_config
+from pypi_portal.extensions import db
 
 OPTIONS = docopt(__doc__)
 
@@ -66,8 +78,6 @@ def setup_logging():
     From: https://github.com/twitter/commons/blob/master/src/python/twitter/common/log/formatters/glog.py
 
     Always logs DEBUG statements somewhere.
-
-    :return:
     """
     log_to_disk = False
     if OPTIONS['--log_dir']:
@@ -118,13 +128,104 @@ def parse_options():
   return config_obj
 
 
+def command(func):
+    """Decorator that registers functions defined for commands in a dictionary.
+
+    Doing this instead of using Flask-Script.
+
+    Positional arguments:
+    func -- the function to decorate
+    """
+    @wraps(func)
+    def wrapped():
+        return func()
+
+    # Register function.
+    if not hasattr(command, 'command_registry'):
+        command.command_registry = dict()
+    command.command_registry[func.__name__] = func
+
+    return wrapped
+
+
+@command
+def devserver():
+    app = create_app(parse_options())
+    fsh_folder = app.blueprints['flask_statics_helper'].static_folder
+    log_messages(app, OPTIONS['--port'], fsh_folder)
+    app.run(host='0.0.0.0', port=int(OPTIONS['--port']))
+
+
+@command
+def tornadoserver():
+    app = create_app(parse_options())
+    fsh_folder = app.blueprints['flask_statics_helper'].static_folder
+    log_messages(app, OPTIONS['--port'], fsh_folder)
+
+    # Setup the application.
+    container = wsgi.WSGIContainer(app)
+    application = web.Application([
+        (r'/static/flask_statics_helper/(.*)', web.StaticFileHandler, dict(path=fsh_folder)),
+        (r'/(favicon\.ico)', web.StaticFileHandler, dict(path=app.static_folder)),
+        (r'/static/(.*)', web.StaticFileHandler, dict(path=app.static_folder)),
+        (r'.*', web.FallbackHandler, dict(fallback=container))
+    ])  # From http://maxburstein.com/blog/django-static-files-heroku/
+    http_server = httpserver.HTTPServer(application)
+    http_server.bind(OPTIONS['--port'])
+
+    # Start the server.
+    http_server.start(0)  # Forks multiple sub-processes
+    ioloop.IOLoop.instance().start()
+
+
+@command
+def celerydev():
+    app = create_app(parse_options(), no_sql=True)
+    Logging._setup = True  # Disable Celery from setting up logging, already done in setup_logging().
+    celery_args = ['celery', 'worker', '-B', '-s', '/tmp/celery.db', '--concurrency=5']
+    with app.app_context():
+        return celery_main(celery_args)
+
+
+@command
+def celerybeat():
+    app = create_app(parse_options(), no_sql=True)
+    Logging._setup = True
+    celery_args = ['celery', 'beat', '-C', '--pidfile=celery_beat.pid']
+    with app.app_context():
+        return celery_main(celery_args)
+
+
+@command
+def celeryworker():
+    app = create_app(parse_options(), no_sql=True)
+    Logging._setup = True
+    celery_args = ['celery', 'worker', '-C', '--autoscale=10,1', '--without-gossip']
+    with app.app_context():
+        return celery_main(celery_args)
+
+
+@command
+def shell():
+    app = create_app(parse_options())
+    app.app_context().push()
+    Shell(make_context=lambda: dict(app=app, db=db)).run(no_ipython=False, no_bpython=False)
+
+
+@command
+def create_all():
+    app = create_app(parse_options())
+    with app.app_context():
+        db.create_all()
+
+
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, lambda *_: sys.exit(0))  # Properly handle Control+C
     setup_logging()
-
-    if not OPTIONS['devserver']:
-        raise NotImplementedError('Only devserver implemented right now.')
-    app__ = create_app(parse_options())
-    fsh_folder__ = app__.blueprints['flask_statics_helper'].static_folder
-    log_messages(app__, OPTIONS['--port'], fsh_folder__)
-    app__.run(host='0.0.0.0', port=int(OPTIONS['--port']))
+    if not OPTIONS['--port'].isdigit():
+        print('ERROR: Port should be a number.')
+        sys.exit(1)
+    for command_name, command_func in getattr(command, 'command_registry').items():
+        if not OPTIONS[command_name]:
+            continue
+        command_func()
