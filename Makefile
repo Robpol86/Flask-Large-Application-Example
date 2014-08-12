@@ -1,3 +1,5 @@
+.PHONY: default isvirtualenv
+
 default:
 	@echo "Local examples:"
 	@echo "    make run        # Starts a Flask development server locally."
@@ -7,9 +9,37 @@ default:
 	@echo "    make lint       # Runs PyLint."
 	@echo "    make test       # Tests entire application with pytest."
 
+isvirtualenv:
+	@if [ -z "$(VIRTUAL_ENV)" ]; then echo "ERROR: Not in a virtualenv." 1>&2; exit 1; fi
+
 run:
 	(((i=0; while \[ $$i -lt 40 \]; do sleep 0.5; i=$$((i+1));\
 	  netstat -anp tcp |grep "\.5000.*LISTEN" &>/dev/null && break; done) &&\
 	  open http://localhost:5000/) &)
 	./manage.py devserver
+
+shell:
+	./manage.py shell
+
+celery:
+	./manage.py celerydev
+
+style:
+	flake8 --max-line-length=120 --statistics pypi_portal
+
+lint:
+	pylint --max-line-length=120 pypi_portal
+
+test:
+	py.test --cov-report term-missing --cov pypi_portal tests
+
+testpdb:
+	py.test --pdb tests
+
+testcovweb:
+	py.test --cov-report html --cov pypi_portal tests
+	open htmlcov/index.html
+
+pipinstall: isvirtualenv
+	pip install -r requirements.txt flake8 pylint ipython pytest-cov
 

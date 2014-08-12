@@ -20,9 +20,9 @@ def test_testing_mode():
     assert current_app.config['TESTING']
 
 
-def test_index_200(test_client):
+def test_index_200():
     """Makes sure the front page returns HTTP 200.
 
     A very basic test, if the front page is broken, something has obviously failed.
     """
-    assert '200 OK' == test_client.get('/').status
+    assert '200 OK' == current_app.test_client().get('/').status
