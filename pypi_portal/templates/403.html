@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block append_title %} - HTTP 403{% endblock %}
+
+{% block main_content %}
+  <div class="jumbotron">
+    <h1>403 Forbidden</h1>
+    <p class="lead">Access denied.</p>
+    <p>URL: {{ request.url }}</p>
+  </div>
+{% endblock %}

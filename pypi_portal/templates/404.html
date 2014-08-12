@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block append_title %} - HTTP 404{% endblock %}
+
+{% block main_content %}
+  <div class="jumbotron">
+    <h1>404 Not Found</h1>
+    <p class="lead">Page not found.</p>
+    <p>URL: {{ request.url }}</p>
+  </div>
+{% endblock %}
