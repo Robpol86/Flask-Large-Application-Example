@@ -52,3 +52,5 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Project specific
+pypi_portal/*/flask_statics_helper

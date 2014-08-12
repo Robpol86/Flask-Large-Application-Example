@@ -13,9 +13,8 @@ isvirtualenv:
 	@if [ -z "$(VIRTUAL_ENV)" ]; then echo "ERROR: Not in a virtualenv." 1>&2; exit 1; fi
 
 run:
-	(((i=0; while \[ $$i -lt 40 \]; do sleep 0.5; i=$$((i+1));\
-	  netstat -anp tcp |grep "\.5000.*LISTEN" &>/dev/null && break; done) &&\
-	  open http://localhost:5000/) &)
+	(((i=0; while \[ $$i -lt 40 \]; do sleep 0.5; i=$$((i+1)); \
+		netstat -anp tcp |grep "\.5000.*LISTEN" &>/dev/null && break; done) && open http://localhost:5000/) &)
 	./manage.py devserver
 
 shell:
@@ -41,5 +40,10 @@ testcovweb:
 	open htmlcov/index.html
 
 pipinstall: isvirtualenv
+	# For development environments. Symlinks are for PyCharm inspections to work with Flask-Statics-Helper.
 	pip install -r requirements.txt flake8 pylint ipython pytest-cov
+	ln -fs `python -c "import flask.ext.statics as a; print a.__path__[0]"`/templates/flask_statics_helper \
+		pypi_portal/templates/flask_statics_helper
+	ln -fs `python -c "import flask.ext.statics as a; print a.__path__[0]"`/static \
+		pypi_portal/static/flask_statics_helper
 
