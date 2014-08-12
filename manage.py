@@ -129,7 +129,20 @@ def parse_options():
 
 
 def command(func):
-    """Decorator that registers functions defined for commands in a dictionary.
+    """Decorator that registers the chosen command/function.
+
+    If a function is decorated with @command but that function name is not a valid "command" according to the docstring,
+    a KeyError will be raised, since that's a bug in this script.
+
+    If a user doesn't specify a valid command in their command line arguments, the above docopt(__doc__) line will print
+    a short summary and call sys.exit() and stop up there.
+
+    If a user specifies a valid command, but for some reason the developer did not register it, an AttributeError will
+    raise, since it is a bug in this script.
+
+    Finally, if a user specifies a valid command and it is registered with @command below, then that command is "chosen"
+    by this decorator function, and set as the attribute `chosen`. It is then executed below in
+    `if __name__ == '__main__':`.
 
     Doing this instead of using Flask-Script.
 
@@ -140,10 +153,11 @@ def command(func):
     def wrapped():
         return func()
 
-    # Register function.
-    if not hasattr(command, 'command_registry'):
-        command.command_registry = dict()
-    command.command_registry[func.__name__] = func
+    # Register chosen function.
+    if func.__name__ not in OPTIONS:
+        raise KeyError('Cannot register {}, not mentioned in docstring/docopt.'.format(func.__name__))
+    if OPTIONS[func.__name__]:
+        command.chosen = func
 
     return wrapped
 
@@ -225,7 +239,4 @@ if __name__ == '__main__':
     if not OPTIONS['--port'].isdigit():
         print('ERROR: Port should be a number.')
         sys.exit(1)
-    for command_name, command_func in getattr(command, 'command_registry').items():
-        if not OPTIONS[command_name]:
-            continue
-        command_func()
+    getattr(command, 'chosen')()  # Execute the function specified by the user.
