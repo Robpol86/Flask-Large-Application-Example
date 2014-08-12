@@ -113,19 +113,19 @@ def log_messages(app, port, fsh_folder):
 
 
 def parse_options():
-  """Parses command line options for Flask.
+    """Parses command line options for Flask.
 
-  Returns:
-  Config instance to pass into create_app().
-  """
-  # Figure out which class will be imported.
-  if OPTIONS['--config_prod']:
-    config_class_string = 'pypi_portal.config.Production'
-  else:
-    config_class_string = 'pypi_portal.config.Config'
-  config_obj = get_config(config_class_string)
+    Returns:
+    Config instance to pass into create_app().
+    """
+    # Figure out which class will be imported.
+    if OPTIONS['--config_prod']:
+        config_class_string = 'pypi_portal.config.Production'
+    else:
+        config_class_string = 'pypi_portal.config.Config'
+    config_obj = get_config(config_class_string)
 
-  return config_obj
+    return config_obj
 
 
 def command(func):
