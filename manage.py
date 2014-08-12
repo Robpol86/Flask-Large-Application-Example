@@ -27,7 +27,7 @@ Usage:
     manage.py tornadoserver [-p NUM] [-l DIR] [--config_prod]
     manage.py celerydev [-l DIR] [--config_prod]
     manage.py celerybeat [-l DIR] [--config_prod]
-    manage.py celeryworker [-l DIR] [--config_prod]
+    manage.py celeryworker [-n NUM] [-l DIR] [--config_prod]
     manage.py shell [--config_prod]
     manage.py create_all [--config_prod]
     manage.py (-h | --help)
@@ -39,6 +39,8 @@ Options:
                             instead of stdout.
                             Only ERROR statements will go to stdout. stderr is
                             not used.
+    -n NUM --name=NUM       Celery Worker name integer.
+                            [default: 1]
     -p NUM --port=NUM       Flask will listen on this port number.
                             [default: 5000]
 """
@@ -46,6 +48,7 @@ Options:
 from __future__ import print_function
 from functools import wraps
 import logging
+import logging.handlers
 import os
 import signal
 import sys
@@ -71,13 +74,16 @@ class CustomFormatter(logging.Formatter):
         return super(CustomFormatter, self).format(record)
 
 
-def setup_logging():
+def setup_logging(name=None):
     """Setup Google-Style logging for the entire application.
 
     At first I hated this but I had to use it for work, and now I prefer it. Who knew?
     From: https://github.com/twitter/commons/blob/master/src/python/twitter/common/log/formatters/glog.py
 
     Always logs DEBUG statements somewhere.
+
+    Positional arguments:
+    name -- Append this string to the log file filename.
     """
     log_to_disk = False
     if OPTIONS['--log_dir']:
@@ -100,6 +106,12 @@ def setup_logging():
     root = logging.getLogger()
     root.setLevel(logging.DEBUG)
     root.addHandler(console_handler)
+
+    if log_to_disk:
+        file_name = os.path.join(OPTIONS['--log_dir'], 'pypi_portal_{}.log'.format(name))
+        file_handler = logging.handlers.TimedRotatingFileHandler(file_name, when='d', backupCount=7)
+        file_handler.setFormatter(formatter)
+        root.addHandler(file_handler)
 
 
 def log_messages(app, port, fsh_folder):
@@ -164,6 +176,7 @@ def command(func):
 
 @command
 def devserver():
+    setup_logging('devserver')
     app = create_app(parse_options())
     fsh_folder = app.blueprints['flask_statics_helper'].static_folder
     log_messages(app, OPTIONS['--port'], fsh_folder)
@@ -172,6 +185,7 @@ def devserver():
 
 @command
 def tornadoserver():
+    setup_logging('tornadoserver')
     app = create_app(parse_options())
     fsh_folder = app.blueprints['flask_statics_helper'].static_folder
     log_messages(app, OPTIONS['--port'], fsh_folder)
@@ -194,6 +208,7 @@ def tornadoserver():
 
 @command
 def celerydev():
+    setup_logging('celerydev')
     app = create_app(parse_options(), no_sql=True)
     Logging._setup = True  # Disable Celery from setting up logging, already done in setup_logging().
     celery_args = ['celery', 'worker', '-B', '-s', '/tmp/celery.db', '--concurrency=5']
@@ -203,6 +218,7 @@ def celerydev():
 
 @command
 def celerybeat():
+    setup_logging('celerybeat')
     app = create_app(parse_options(), no_sql=True)
     Logging._setup = True
     celery_args = ['celery', 'beat', '-C', '--pidfile=celery_beat.pid']
@@ -212,15 +228,17 @@ def celerybeat():
 
 @command
 def celeryworker():
+    setup_logging('celeryworker{}'.format(OPTIONS['--name']))
     app = create_app(parse_options(), no_sql=True)
     Logging._setup = True
-    celery_args = ['celery', 'worker', '-C', '--autoscale=10,1', '--without-gossip']
+    celery_args = ['celery', 'worker', '-n', OPTIONS['--name'], '-C', '--autoscale=10,1', '--without-gossip']
     with app.app_context():
         return celery_main(celery_args)
 
 
 @command
 def shell():
+    setup_logging('shell')
     app = create_app(parse_options())
     app.app_context().push()
     Shell(make_context=lambda: dict(app=app, db=db)).run(no_ipython=False, no_bpython=False)
@@ -228,6 +246,7 @@ def shell():
 
 @command
 def create_all():
+    setup_logging('create_all')
     app = create_app(parse_options())
     with app.app_context():
         db.create_all()
@@ -235,7 +254,6 @@ def create_all():
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, lambda *_: sys.exit(0))  # Properly handle Control+C
-    setup_logging()
     if not OPTIONS['--port'].isdigit():
         print('ERROR: Port should be a number.')
         sys.exit(1)
