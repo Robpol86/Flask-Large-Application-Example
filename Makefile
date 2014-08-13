@@ -1,3 +1,4 @@
+PYCODE = import flask.ext.statics as a; print a.__path__[0]
 .PHONY: default isvirtualenv
 
 default:
@@ -42,8 +43,8 @@ testcovweb:
 pipinstall: isvirtualenv
 	# For development environments. Symlinks are for PyCharm inspections to work with Flask-Statics-Helper.
 	pip install -r requirements.txt flake8 pylint ipython pytest-cov
-	ln -fs `python -c "import flask.ext.statics as a; print a.__path__[0]"`/templates/flask_statics_helper \
+	[ -h pypi_portal/templates/flask_statics_helper ] || ln -s `python -c "$(PYCODE)"`/templates/flask_statics_helper \
 		pypi_portal/templates/flask_statics_helper
-	ln -fs `python -c "import flask.ext.statics as a; print a.__path__[0]"`/static \
+	[ -h pypi_portal/static/flask_statics_helper ] || ln -s `python -c "$(PYCODE)"`/static \
 		pypi_portal/static/flask_statics_helper
 

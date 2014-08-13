@@ -8,6 +8,7 @@ class HardCoded(object):
     extensions goes here.
     """
     ADMINS = ['me@me.com']
+    DB_MODELS_IMPORTS = ('pypi',)  # Like CELERY_IMPORTS in CeleryConfig.
     ENVIRONMENT = property(lambda self: self.__class__.__name__)
     _SQLALCHEMY_DATABASE_DATABASE = 'pypi_portal'
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
@@ -23,6 +24,7 @@ class CeleryConfig(HardCoded):
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_ACKS_LATE = True
     CELERY_DISABLE_RATE_LIMITS = True
+    CELERY_IMPORTS = ()
     CELERY_RESULT_SERIALIZER = 'json'
     CELERY_TASK_RESULT_EXPIRES = 10 * 60  # Dispose of Celery Beat results after 10 minutes.
     CELERY_TASK_SERIALIZER = 'json'

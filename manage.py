@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.7
-"""Main entry-point into the 'PyPi Portal' Flask and Celery application.
+"""Main entry-point into the 'PyPI Portal' Flask and Celery application.
 
 This is a demo Flask application used to show how I structure my large Flask
 applications.
@@ -95,7 +95,7 @@ def setup_logging(name=None):
             sys.exit(1)
         log_to_disk = True
 
-    fmt = '%(levelletter)s%(asctime)s.%(msecs)d %(process)d %(filename)s:%(lineno)d] %(message)s'
+    fmt = '%(levelletter)s%(asctime)s.%(msecs).03d %(process)d %(filename)s:%(lineno)d] %(message)s'
     datefmt = '%m%d %H:%M:%S'
     formatter = CustomFormatter(fmt, datefmt)
 
@@ -248,8 +248,14 @@ def shell():
 def create_all():
     setup_logging('create_all')
     app = create_app(parse_options())
+    log = logging.getLogger(__name__)
     with app.app_context():
+        tables_before = {t[0] for t in db.session.execute('SHOW TABLES')}
         db.create_all()
+        tables_after = {t[0] for t in db.session.execute('SHOW TABLES')}
+    created_tables = tables_after - tables_before
+    for table in created_tables:
+        log.info('Created table: {}'.format(table))
 
 
 if __name__ == '__main__':
