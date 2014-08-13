@@ -4,6 +4,7 @@ from HTMLParser import HTMLParser
 from logging import getLogger
 import socket
 
+from flask import current_app
 from flask.ext.celery import single_instance
 import requests
 
@@ -54,8 +55,9 @@ def poll_simple():
 
     # Query URL.
     url = 'https://pypi.python.org/simple/'
+    headers = {'User-Agent': current_app.config['USER_AGENT'], 'From': current_app.config['ADMINS'][0]}
     try:
-        response = requests.get(url, timeout=3)
+        response = requests.get(url, timeout=3, headers=headers)
         data = response.text.encode('utf-8')
     except (requests.Timeout, socket.timeout):
         LOG.error('Request to {} timed out.'.format(url))

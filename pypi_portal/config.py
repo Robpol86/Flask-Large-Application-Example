@@ -1,3 +1,5 @@
+import os
+import sys
 from urllib import quote_plus
 
 
@@ -10,6 +12,9 @@ class HardCoded(object):
     ADMINS = ['me@me.com']
     DB_MODELS_IMPORTS = ('pypi',)  # Like CELERY_IMPORTS in CeleryConfig.
     ENVIRONMENT = property(lambda self: self.__class__.__name__)
+    USER_AGENT = 'pypi_portal/1.0-demo ({}, {})'.format(
+        '{}.{}.{}-{}{}'.format(*sys.version_info), ' '.join(os.uname()[::2])
+    )
     _SQLALCHEMY_DATABASE_DATABASE = 'pypi_portal'
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
     _SQLALCHEMY_DATABASE_PASSWORD = 'pypi_p@ssword'
