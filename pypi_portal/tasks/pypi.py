@@ -64,6 +64,6 @@ def update_package_list():
     LOG.debug('Found {} new packages in PyPI.'.format(len(new_package_names)))
     with db.session.begin_nested():
         for name, data in packages.items():
-            db.session.merge(Package(name=name, summary=data['summary'], latest_version=data['version']))
+            db.session.merge(Package(id=data['id'], name=name, summary=data['summary'], latest_version=data['version']))
     db.session.commit()
     return new_package_names
