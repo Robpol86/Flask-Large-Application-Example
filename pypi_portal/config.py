@@ -24,7 +24,7 @@ class CeleryConfig(HardCoded):
     CELERY_ACCEPT_CONTENT = ['json']
     CELERY_ACKS_LATE = True
     CELERY_DISABLE_RATE_LIMITS = True
-    CELERY_IMPORTS = ()
+    CELERY_IMPORTS = ('pypi',)
     CELERY_RESULT_SERIALIZER = 'json'
     CELERY_TASK_RESULT_EXPIRES = 10 * 60  # Dispose of Celery Beat results after 10 minutes.
     CELERY_TASK_SERIALIZER = 'json'

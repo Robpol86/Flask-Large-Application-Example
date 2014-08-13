@@ -7,4 +7,5 @@ Flask-Statics-Helper>=0.3.0
 Flask>=0.10.1
 MySQL-python>=1.2.5
 docopt>=0.6.1
+requests>=2.3.0
 tornado>=4.0
