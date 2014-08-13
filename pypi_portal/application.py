@@ -6,6 +6,7 @@ import os
 
 from flask import Flask
 from flask.ext.statics import Statics
+from yaml import load
 
 import pypi_portal as app_root
 from pypi_portal.blueprints import all_blueprints
@@ -17,12 +18,13 @@ STATIC_FOLDER = os.path.join(APP_ROOT_FOLDER, 'static')
 REDIS_SCRIPTS_FOLDER = os.path.join(APP_ROOT_FOLDER, 'redis_scripts')
 
 
-def get_config(config_class_string):
+def get_config(config_class_string, yaml_files=None):
     """Load the Flask config from a class.
 
     Positional arguments:
     config_class_string -- string representation of a configuration class that will be loaded (e.g.
         'pypi_portal.config.Production').
+    yaml_files -- List of YAML files to load. This is for testing, leave None in dev/production.
 
     Returns:
     A class object to be fed into app.config.from_object().
@@ -42,6 +44,20 @@ def get_config(config_class_string):
         config_obj.DB_MODELS_IMPORTS = [db_fmt.format(m) for m in config_obj.DB_MODELS_IMPORTS]
     for script_name, script_file in getattr(config_obj, 'REDIS_SCRIPTS', dict()).items():
         config_obj.REDIS_SCRIPTS[script_name] = os.path.join(REDIS_SCRIPTS_FOLDER, script_file)
+
+    # Load additional configuration settings.
+    yaml_files = yaml_files or [f for f in [
+        os.path.abspath(os.path.join(APP_ROOT_FOLDER, '..', 'config.yml')),
+        os.path.join(APP_ROOT_FOLDER, 'config.yml')
+    ] if os.path.exists(f)]
+    additional_dict = dict()
+    for y in yaml_files:
+        with open(y) as f:
+            additional_dict.update(load(f.read()))
+
+    # Merge the rest into the Flask app config.
+    for key, value in additional_dict.items():
+        setattr(config_obj, key, value)
 
     return config_obj
 
@@ -87,7 +103,7 @@ def create_app(config_obj, no_sql=False):
     mail.init_app(app)
 
     # Activate middleware.
-    locale.setlocale(locale.LC_ALL, 'en_US')  # For filters inside the middleware file.
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')  # For filters inside the middleware file.
     with app.app_context():
         import_module('pypi_portal.middleware')
 
