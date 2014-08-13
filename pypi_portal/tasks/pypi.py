@@ -1,47 +1,36 @@
 """Retrieve data from PyPI."""
 
-from HTMLParser import HTMLParser
+from distutils.version import LooseVersion
 from logging import getLogger
-import socket
+import xmlrpclib
 
-from flask import current_app
 from flask.ext.celery import single_instance
-import requests
 
 from pypi_portal.extensions import celery, db, redis
 from pypi_portal.models.pypi import Package
 from pypi_portal.models.redis import POLL_SIMPLE_THROTTLE
 
 LOG = getLogger(__name__)
-THROTTLE = 4 * 60 * 60
+THROTTLE = 1 * 60 * 60
 
 
-class HTMLParserFindLinks(HTMLParser):
-    """Find links in HTML data."""
-
-    def __init__(self, data):
-        HTMLParser.__init__(self)
-        self.links = set()
-        self.feed(data)
-
-    def handle_starttag(self, tag, attrs):
-        if tag != 'a':
-            return
-        link = dict(attrs).get('href')
-        if link:
-            self.links.add(link)
+def query(url='https://pypi.python.org/pypi'):
+    """Simply calls and returns xmlrpclib.ServerProxy().search. This is its own function for testing."""
+    client = xmlrpclib.ServerProxy(url)
+    results = client.search(dict(summary=''))
+    return results
 
 
 @celery.task(bind=True, soft_time_limit=30)
 @single_instance
-def poll_simple():
-    """Get a list of all packages from https://pypi.python.org/simple/.
+def update_package_list():
+    """Get a list of all packages from PyPI through their XMLRPC API.
 
     This task returns something in case the user schedules it from a view. The view can wait up to a certain amount of
     time for this task to finish, and if nothing times out, it can tell the user if it found any new packages.
 
     Since views can schedule this task, we don't want some rude person hammering PyPI or our application with repeated
-    requests. This task is limited to one run per 4 hours at most.
+    requests. This task is limited to one run per 1 hour at most.
 
     Returns:
     Set of new packages found. Returns None if task is rate-limited.
@@ -53,43 +42,28 @@ def poll_simple():
         LOG.warning('poll_simple() task has already executed in the past 4 hours. Rate limiting.')
         return None
 
-    # Query URL.
-    url = 'https://pypi.python.org/simple/'
-    headers = {'User-Agent': current_app.config['USER_AGENT'], 'From': current_app.config['ADMINS'][0]}
-    try:
-        response = requests.get(url, timeout=3, headers=headers)
-        data = response.text.encode('utf-8')
-    except (requests.Timeout, socket.timeout):
-        LOG.error('Request to {} timed out.'.format(url))
-        return set()
-    except requests.ConnectionError as e:
-        LOG.error('Request to {} failed: {}'.format(url, e.args[0].message))
-        return set()
-    except (UnicodeDecodeError, UnicodeEncodeError):
-        LOG.error('Reply from {} cannot be encoded as unicode.'.format(url))
-        return set()
-    if response.status_code != 200:
-        LOG.error('Reply from {} was not HTTP 200: HTTP {}'.format(url, response.status_code))
-        return set()
-    if not data:
-        LOG.error('Reply from {} was empty.'.format(url))
+    # Query API.
+    results = query()
+    if not results:
+        LOG.error('Reply from API had no results.')
         return set()
 
-    # Parse HTML.
-    packages = HTMLParserFindLinks(data).links
-    if not packages:
-        LOG.error('Reply from {} had no links.'.format(url))
-        return set()
+    # Sort through packages.
+    results.sort(key=lambda x: (x['name'], LooseVersion(x['version'])))
+    filtered = (r for r in results if r['version'][0].isdigit())
+    packages = {r['name']: dict(summary=r['summary'], version=r['version'], id=0) for r in filtered}
 
-    # Are there any new packages?
-    before_set = set(db.session.query(Package.name).all())
-    new_packages = packages - before_set
-    if not new_packages:
-        return set()
+    # Update row id values in the dictionary for old packages (for db.session.merge).
+    for row in db.session.query(Package.id, Package.name):
+        pkg = packages.get(row[1])
+        if pkg:
+            pkg['id'] = row[0]
+    new_package_names = {n for n, d in packages.items() if not d['id']}
 
-    # Add to database.
-    LOG.debug('Found {} new packages in PyPI.'.format(len(new_packages)))
+    # Merge into database.
+    LOG.debug('Found {} new packages in PyPI.'.format(len(new_package_names)))
     with db.session.begin_nested():
-        db.session.add_all([Package(name=i) for i in new_packages])
+        for name, data in packages.items():
+            db.session.merge(Package(name=name, summary=data['summary'], latest_version=data['version']))
     db.session.commit()
-    return new_packages
+    return new_package_names
