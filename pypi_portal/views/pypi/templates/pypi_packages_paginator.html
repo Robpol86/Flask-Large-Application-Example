@@ -1,0 +1,25 @@
+{% macro paginator_buttons(pagination) %}
+    <ul class="pagination pull-right">
+        {% if pagination.has_prev %}
+            <li><a href="{{ url_for('.index', page=pagination.prev_num) }}">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+
+        {% for page in pagination.iter_pages() %}
+            {% if page == None %}
+                <li class="disabled"><span>&hellip;</span></li>
+            {% elif page == pagination.page %}
+                <li class="active"><span>{{ page }} <span class="sr-only">(current)</span></span></li>
+            {% else %}
+                <li><a href="{{ url_for('.index', page=page) }}">{{ page }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+            <li><a href="{{ url_for('.index', page=pagination.next_num) }}">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+{% endmacro %}

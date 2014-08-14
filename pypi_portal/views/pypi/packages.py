@@ -5,6 +5,7 @@ from flask import redirect, render_template, url_for
 from pypi_portal.blueprints import pypi_packages
 from pypi_portal.core import flash
 from pypi_portal.extensions import redis
+from pypi_portal.models.pypi import Package
 from pypi_portal.models.redis import POLL_SIMPLE_THROTTLE
 from pypi_portal.tasks.pypi import update_package_list
 
@@ -12,9 +13,11 @@ SLEEP_FOR = 0.1  # Seconds to wait in between checks.
 WAIT_UP_TO = 5  # Wait up to these many seconds for task to finish. Won't block view for more than this.
 
 
-@pypi_packages.route('/')
-def index():
-    return render_template('pypi_packages.html')
+@pypi_packages.route('/', defaults=dict(page=1))
+@pypi_packages.route('/page/<int:page>')
+def index(page):
+    pagination = Package.query.order_by('name').paginate(page, per_page=25, error_out=False)
+    return render_template('pypi_packages.html', pagination=pagination)
 
 
 @pypi_packages.route('/sync')

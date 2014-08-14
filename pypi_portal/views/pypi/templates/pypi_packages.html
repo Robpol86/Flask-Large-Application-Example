@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'pypi_packages_paginator.html' import paginator_buttons %}
 
 {% block container %}
     <div>
@@ -9,6 +10,32 @@
         </ul>
         <h1>All PyPI Packages</h1>
     </div>
+
+    <div class="table-responsive">
+        <table class="table table-condensed table-bordered table-striped">
+            <thead><tr>
+                <th>Name</th>
+                <th>Version</th>
+                <th>Summary</th>
+            </tr></thead>
+
+            <tbody>
+                {% for item in pagination.items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.latest_version }}</td>
+                        <td>{{ item.summary }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center">Local database is empty.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {{ paginator_buttons(pagination) }}
 {% endblock %}
 
 {% block styles %}
@@ -17,6 +44,10 @@
         .nav-pills>li.success>a,.nav-pills>li.success>a:hover,.nav-pills>li.success>a:focus {
             color: #fff;
             background-color: #5cb85c;
+        }
+
+        @-moz-document url-prefix() {
+          fieldset { display: table-cell; }
         }
     </style>
 {% endblock %}

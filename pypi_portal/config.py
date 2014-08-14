@@ -1,4 +1,5 @@
 from urllib import quote_plus
+from celery.schedules import crontab
 
 
 class HardCoded(object):
@@ -29,6 +30,10 @@ class CeleryConfig(HardCoded):
     CELERY_TASK_RESULT_EXPIRES = 10 * 60  # Dispose of Celery Beat results after 10 minutes.
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_TRACK_STARTED = True
+
+    CELERYBEAT_SCHEDULE = {
+        'pypy-every-day': dict(task='pypi.update_package_list', schedule=crontab(hour='0')),
+    }
 
 
 class Config(CeleryConfig):
