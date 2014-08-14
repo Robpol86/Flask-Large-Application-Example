@@ -26,6 +26,7 @@ def _factory(partial_module_string, url_prefix):
 
 
 home_index = _factory('home.index', '/')
+pypi_packages = _factory('pypi.packages', '/pypi')
 
 
-all_blueprints = (home_index,)
+all_blueprints = (home_index, pypi_packages,)

@@ -21,7 +21,7 @@ def query(url='https://pypi.python.org/pypi'):
     return results
 
 
-@celery.task(bind=True, soft_time_limit=30)
+@celery.task(bind=True, soft_time_limit=60)
 @single_instance
 def update_package_list():
     """Get a list of all packages from PyPI through their XMLRPC API.

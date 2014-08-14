@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block container %}
+    <div>
+        <ul class="nav nav-pills pull-right">
+            <li class="success">
+                <a href="{{ url_for('.sync') }}">Sync with PyPI</a>
+            </li>
+        </ul>
+        <h1>All PyPI Packages</h1>
+    </div>
+{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <style type="text/css">
+        .nav-pills>li.success>a,.nav-pills>li.success>a:hover,.nav-pills>li.success>a:focus {
+            color: #fff;
+            background-color: #5cb85c;
+        }
+    </style>
+{% endblock %}

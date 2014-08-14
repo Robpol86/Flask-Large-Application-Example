@@ -16,6 +16,7 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li><a href="/">Home</a></li>
+                <li><a href="{{ url_for('pypi.packages.index') }}">Packages</a></li>
             </ul>
             {{ well_alert_navbar(flash_messages_well) }}
         </div>
