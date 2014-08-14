@@ -1,52 +1,54 @@
 {########################################## Well Alerts ###########################################}
 {% macro well_alert_navbar(messages) %}{% if messages %}
-  <ul class="nav navbar-nav navbar-right">
-    <li><a href="#" data-toggle="collapse" data-target="#viewFlashedWell" class="navbar-brand"
-        title="Alerts found, click to view.">
-      {% for _ in messages %}
-        <i style="color: red;" class="glyphicon glyphicon-warning-sign shake shake-constant"></i>
-      {% endfor %}
-    </a></li>
-  </ul>
+    <ul class="nav navbar-nav navbar-right">
+        <li><a href="#" data-toggle="collapse" data-target="#viewFlashedWell" class="navbar-brand"
+               title="Alerts found, click to view.">
+            {% for _ in messages %}
+                <i style="color: red;" class="glyphicon glyphicon-warning-sign shake shake-constant"></i>
+            {% endfor %}
+        </a></li>
+    </ul>
 {% endif %}{% endmacro %}
 
 {% macro well_alert(messages) %}{% if messages %}
-  <div class="collapse container" id="viewFlashedWell">
-    {% for message in messages %}
-      <div class="well well-sm customAlert">
-        {{ message|whitelist }}
-      </div>
-    {% endfor %}
-  </div>
+    <div class="collapse container" id="viewFlashedWell">
+        {% for message in messages %}
+            <div class="well well-sm customAlert">
+                {{ message|whitelist }}
+            </div>
+        {% endfor %}
+    </div>
 {% endif %}{% endmacro %}
 
 
 {########################################## Modal Alerts ##########################################}
 {% macro modal_alert(messages) %}{% if messages %}
-  <div class="modal fade in" style="display: block">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-body customAlert">
-          {% for message in messages %}
-            <p>
-              {{ message|whitelist }}
-            </p>
-          {% endfor %}
+    <div class="modal fade in" style="display: block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body customAlert">
+                    {% for message in messages %}
+                        <p>
+                            {{ message|whitelist }}
+                        </p>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="$('.modal').hide()">
+                        Close
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="$('.modal').hide()">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
 {% endif %}{% endmacro %}
 
 
 {##################################### Normal (Growl) Alerts ######################################}
 {% macro normal_alert(messages) %}{% if messages %}
-  <script type='text/javascript'>
-    {% for category, message in messages %}
-      $.growl('{{ message|whitelist }}', { type: '{{ category }}' });
-    {% endfor %}
-  </script>
+    <script type='text/javascript'>
+        {% for category, message in messages %}
+            $.growl('{{ message|whitelist }}', { type: '{{ category }}' });
+        {% endfor %}
+    </script>
 {% endif %}{% endmacro %}

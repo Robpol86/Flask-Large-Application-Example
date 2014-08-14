@@ -12,36 +12,36 @@
 {% block title %}PyPI Portal{%- block append_title %}{% endblock %}{% endblock %}
 
 {% block styles %}
-  {{ super() }}
-  <link rel="shortcut icon" href="/static/favicon.ico?" />
+    {{ super() }}
+    <link rel="shortcut icon" href="/static/favicon.ico?" />
 
-  {% if flash_messages_normal or flash_messages_modal or flash_messages_well %}
-    <style type="text/css">
-      .customAlert { word-break: break-all; }
-    </style>
-  {% endif %}
+    {% if flash_messages_normal or flash_messages_modal or flash_messages_well %}
+        <style type="text/css">
+            .customAlert { word-break: break-all; }
+        </style>
+    {% endif %}
 {% endblock %}
 
 {% block navbar %}
-  {# Need to set these variables to fix a "context depth limit" with Jinja2 blocks and includes. #}
-  {% set flash_messages_modal = flash_messages_modal %}
-  {% set flash_messages_well = flash_messages_well %}
-  {% include 'navbar.html' with context %}
+    {# Need to set these variables to fix a "context depth limit" with Jinja2 blocks and includes. #}
+    {% set flash_messages_modal = flash_messages_modal %}
+    {% set flash_messages_well = flash_messages_well %}
+    {% include 'navbar.html' with context %}
 {% endblock %}
 
 {% block scripts %}
-  {{ super() }}
+    {{ super() }}
 
-  {% if flash_messages_normal %}
-    <script type='text/javascript'>
-      $.growl.default_options.delay = 0;
-      $.growl.default_options.position = { from: 'top', align: 'center'};
-      $.growl.default_options.template.container =
-          '<div class="col-xs-10 col-sm-10 col-md-6 col-lg-6 growl-animated alert abAlert">';
-    </script>
-  {% endif %}
+    {% if flash_messages_normal %}
+        <script type='text/javascript'>
+            $.growl.default_options.delay = 0;
+            $.growl.default_options.position = { from: 'top', align: 'center'};
+            $.growl.default_options.template.container =
+                    '<div class="col-xs-10 col-sm-10 col-md-6 col-lg-6 growl-animated alert abAlert">';
+        </script>
+    {% endif %}
 
-  {{ normal_alert(flash_messages_normal) }}
+    {{ normal_alert(flash_messages_normal) }}
 {% endblock %}
 
 {# Includes jQuery already. Specify additional JS libraries like d3/FontAwesome in your template. #}
