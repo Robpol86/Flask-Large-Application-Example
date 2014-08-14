@@ -1,9 +1,18 @@
 {% extends 'base.html' %}
 
-{% block content %}
-    <div class="container">
-        <div class="jumbotron">
-            <h2>Hello World.</h2>
-        </div>
+{% block container %}
+    <div class="jumbotron">
+        <h1>Flask Large Application Example</h1>
+        PyPI Portal is a small demo app used as an example of a potentially large Flask application with several
+        views and Celery tasks.
     </div>
+
+    <p class="lead">
+        This application doesn't do much. It runs a Celery task once a day to get all of the package names, summaries,
+        and versions in PyPI and display them in a paginated table.
+    </p>
+
+    You can check that out in the <span class="label label-default">Packages</span> link in the Navbar above. You can find
+    out more about this example in the <a href="https://github.com/Robpol86/Flask-Large-Application-Example"
+    target="_blank">GitHub page</a>.
 {% endblock %}
