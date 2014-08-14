@@ -21,7 +21,7 @@ def query(url='https://pypi.python.org/pypi'):
     return results
 
 
-@celery.task(bind=True, soft_time_limit=60)
+@celery.task(bind=True, soft_time_limit=120)
 @single_instance
 def update_package_list():
     """Get a list of all packages from PyPI through their XMLRPC API.
@@ -33,7 +33,7 @@ def update_package_list():
     requests. This task is limited to one run per 1 hour at most.
 
     Returns:
-    Set of new packages found. Returns None if task is rate-limited.
+    List of new packages found. Returns None if task is rate-limited.
     """
     # Rate limit.
     lock = redis.lock(POLL_SIMPLE_THROTTLE, timeout=int(THROTTLE))
@@ -46,24 +46,25 @@ def update_package_list():
     results = query()
     if not results:
         LOG.error('Reply from API had no results.')
-        return set()
+        return list()
 
-    # Sort through packages.
+    LOG.debug('Sorting results.')
     results.sort(key=lambda x: (x['name'], LooseVersion(x['version'])))
     filtered = (r for r in results if r['version'][0].isdigit())
     packages = {r['name']: dict(summary=r['summary'], version=r['version'], id=0) for r in filtered}
 
-    # Update row id values in the dictionary for old packages (for db.session.merge).
-    for row in db.session.query(Package.id, Package.name):
-        pkg = packages.get(row[1])
-        if pkg:
-            pkg['id'] = row[0]
+    LOG.debug('Pruning unchanged packages.')
+    for row in db.session.query(Package.id, Package.name, Package.summary, Package.latest_version):
+        if packages.get(row[1]) == dict(summary=row[2], version=row[3], id=0):
+            packages.pop(row[1])
+        elif row[1] in packages:
+            packages[row[1]]['id'] = row[0]
     new_package_names = {n for n, d in packages.items() if not d['id']}
 
     # Merge into database.
-    LOG.debug('Found {} new packages in PyPI.'.format(len(new_package_names)))
+    LOG.debug('Found {} new packages in PyPI, updating {} total.'.format(len(new_package_names), len(packages)))
     with db.session.begin_nested():
         for name, data in packages.items():
             db.session.merge(Package(id=data['id'], name=name, summary=data['summary'], latest_version=data['version']))
     db.session.commit()
-    return new_package_names
+    return list(new_package_names)

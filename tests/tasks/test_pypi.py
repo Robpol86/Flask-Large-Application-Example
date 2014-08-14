@@ -9,7 +9,7 @@ from pypi_portal.tasks.pypi import update_package_list
 def test_no_results(alter_query):
     alter_query(set())
     redis.delete(POLL_SIMPLE_THROTTLE)
-    assert set() == update_package_list()
+    assert list() == update_package_list()
 
 
 def test_rate_limit():
@@ -18,7 +18,7 @@ def test_rate_limit():
 
     redis.delete(POLL_SIMPLE_THROTTLE)
     assert not redis.exists(POLL_SIMPLE_THROTTLE)
-    assert set() == update_package_list()
+    assert list() == update_package_list()
 
     assert redis.exists(POLL_SIMPLE_THROTTLE)
     assert update_package_list() is None
@@ -34,7 +34,7 @@ def test_sorting(alter_query, latest):
     ]
     alter_query(value)
     redis.delete(POLL_SIMPLE_THROTTLE)
-    assert {'packageA', 'packageB'} == update_package_list()
+    assert sorted(['packageA', 'packageB']) == sorted(update_package_list())
 
     expected = [
         ('packageA', 'Test package.', '2.0.0-beta' if latest else '1.10.0'),
@@ -52,7 +52,7 @@ def test_updating(alter_query):
     ]
     alter_query(value)
     redis.delete(POLL_SIMPLE_THROTTLE)
-    assert {'packageA', 'packageB'} == update_package_list()
+    assert sorted(['packageA', 'packageB']) == sorted(update_package_list())
     expected = [
         ('packageA', 'Test package.', '2.0.0-beta'),
         ('packageB', 'Test package.', '3.0.0'),
@@ -67,7 +67,7 @@ def test_updating(alter_query):
     ]
     alter_query(value)
     redis.delete(POLL_SIMPLE_THROTTLE)
-    assert {'packageC'} == update_package_list()
+    assert ['packageC'] == update_package_list()
     expected = [
         ('packageA', 'Test package.', '2.0.0'),
         ('packageB', 'Test package.', '3.0.0'),
@@ -82,7 +82,7 @@ def test_updating(alter_query):
     ]
     alter_query(value)
     redis.delete(POLL_SIMPLE_THROTTLE)
-    assert set() == update_package_list()
+    assert list() == update_package_list()
     expected = [
         ('packageA', 'Test package.', '2.0.0'),
         ('packageB', 'Test package.', '3.0.0'),
