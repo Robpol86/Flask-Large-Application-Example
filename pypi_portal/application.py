@@ -47,8 +47,9 @@ def get_config(config_class_string, yaml_files=None):
 
     # Load additional configuration settings.
     yaml_files = yaml_files or [f for f in [
+        os.path.join('/', 'etc', 'pypi_portal', 'config.yml'),
         os.path.abspath(os.path.join(APP_ROOT_FOLDER, '..', 'config.yml')),
-        os.path.join(APP_ROOT_FOLDER, 'config.yml')
+        os.path.join(APP_ROOT_FOLDER, 'config.yml'),
     ] if os.path.exists(f)]
     additional_dict = dict()
     for y in yaml_files:

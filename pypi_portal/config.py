@@ -8,7 +8,7 @@ class HardCoded(object):
     All hard coded settings/data that are not actual/official configuration options for Flask, Celery, or their
     extensions goes here.
     """
-    ADMINS = ['me@me.com']
+    ADMINS = ['me@me.test']
     DB_MODELS_IMPORTS = ('pypi',)  # Like CELERY_IMPORTS in CeleryConfig.
     ENVIRONMENT = property(lambda self: self.__class__.__name__)
     _SQLALCHEMY_DATABASE_DATABASE = 'pypi_portal'
@@ -41,8 +41,8 @@ class Config(CeleryConfig):
     DEBUG = True
     TESTING = False
     SECRET_KEY = "i_don't_want_my_cookies_expiring_while_developing"
-    MAIL_SERVER = 'smtp.localhost.com'
-    MAIL_DEFAULT_SENDER = 'admin@demo.com'
+    MAIL_SERVER = 'smtp.localhost.test'
+    MAIL_DEFAULT_SENDER = 'admin@demo.test'
     MAIL_SUPPRESS_SEND = True
     REDIS_URL = 'redis://localhost/0'
     SQLALCHEMY_DATABASE_URI = property(lambda self: 'mysql://{u}:{p}@{h}/{d}'.format(
@@ -61,6 +61,6 @@ class Testing(Config):
 class Production(Config):
     DEBUG = False
     SECRET_KEY = None  # To be overwritten by a YAML file.
-    ADMINS = ['my-team@me.com']
+    ADMINS = ['my-team@me.test']
     MAIL_SUPPRESS_SEND = False
     STATICS_MINIFY = True
