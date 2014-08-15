@@ -45,9 +45,8 @@ Options:
                                 [default: ./celery_beat.pid]
     -p NUM --port=NUM           Flask will listen on this port number.
                                 [default: 5000]
-    -s FILE --schedule=FILE     Celery Beat schedule database file (.db file
-                                extension automatically added).
-                                [default: ./celery_beat]
+    -s FILE --schedule=FILE     Celery Beat schedule database file.
+                                [default: ./celery_beat.db]
 """
 
 from __future__ import print_function
