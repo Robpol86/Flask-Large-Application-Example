@@ -26,23 +26,28 @@ Usage:
     manage.py devserver [-p NUM] [-l DIR] [--config_prod]
     manage.py tornadoserver [-p NUM] [-l DIR] [--config_prod]
     manage.py celerydev [-l DIR] [--config_prod]
-    manage.py celerybeat [-l DIR] [--config_prod]
+    manage.py celerybeat [-s FILE] [--pid=FILE] [-l DIR] [--config_prod]
     manage.py celeryworker [-n NUM] [-l DIR] [--config_prod]
     manage.py shell [--config_prod]
     manage.py create_all [--config_prod]
     manage.py (-h | --help)
 
 Options:
-    --config_prod           Load the production configuration instead of
-                            development.
-    -l DIR --log_dir=DIR    Log all statements to file in this directory
-                            instead of stdout.
-                            Only ERROR statements will go to stdout. stderr is
-                            not used.
-    -n NUM --name=NUM       Celery Worker name integer.
-                            [default: 1]
-    -p NUM --port=NUM       Flask will listen on this port number.
-                            [default: 5000]
+    --config_prod               Load the production configuration instead of
+                                development.
+    -l DIR --log_dir=DIR        Log all statements to file in this directory
+                                instead of stdout.
+                                Only ERROR statements will go to stdout. stderr
+                                is not used.
+    -n NUM --name=NUM           Celery Worker name integer.
+                                [default: 1]
+    --pid=FILE                  Celery Beat PID file.
+                                [default: ./celery_beat.pid]
+    -p NUM --port=NUM           Flask will listen on this port number.
+                                [default: 5000]
+    -s FILE --schedule=FILE     Celery Beat schedule database file (.db file
+                                extension automatically added).
+                                [default: ./celery_beat]
 """
 
 from __future__ import print_function
@@ -221,7 +226,7 @@ def celerybeat():
     setup_logging('celerybeat')
     app = create_app(parse_options(), no_sql=True)
     Logging._setup = True
-    celery_args = ['celery', 'beat', '-C', '--pidfile=celery_beat.pid']
+    celery_args = ['celery', 'beat', '-C', '--pidfile', OPTIONS['--pid'], '-s', OPTIONS['--schedule']]
     with app.app_context():
         return celery_main(celery_args)
 
