@@ -78,7 +78,7 @@ The first thing you may notice are where blueprints are defined. Flask applicati
 inside view modules themselves, and must be imported in or after `create_app()`. URLs for blueprints are usually set in
 or after `create_app()` as well.
 
-I never liked defining blueprints in the views since according to pep8 the variables should be IN_ALL_CAPS (it's true
+I've never liked defining blueprints in the views since according to pep8 the variables should be IN_ALL_CAPS (it's true
 that blueprints are still module-level in `blueprints.py` but since that file is 99% module-level variables I make a
 small exception to pep8 and keep it lower case), plus usually it's the only module-level variable in the file.
 
@@ -123,4 +123,4 @@ I structure my `config.py` with several classes, inheriting from the previous on
 
 The tests directory structure mirrors the application's. This makes it easy to group tests for specific views/modules.
 If a module such as `core/email.py` requires several tests, I would split them up into different test modules inside a
-a package such as `tests/core/email/test_feature1.py` and so on.
+package such as `tests/core/email/test_feature1.py` and so on.
