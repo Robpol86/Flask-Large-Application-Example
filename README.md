@@ -1,8 +1,17 @@
 # Flask-Large-Application-Example
 
-This is how I structure my large Flask applications.
+PyPI Portal is a small demo app used as an example of a potentially large Flask application with several views and Celery tasks. This is how I structure my large Flask applications. In this README I'll explain my design choices with several aspects of the project.
+
+For information on how to deploy this application to different production environments, visit [the project's wiki](https://github.com/Robpol86/Flask-Large-Application-Example/wiki).
+
+For a demo of this application running in the cloud, visit http://ec2-54-213-40-230.us-west-2.compute.amazonaws.com/.
 
 [![Build Status](https://travis-ci.org/Robpol86/Flask-Large-Application-Example.svg?branch=master)]
 (https://travis-ci.org/Robpol86/Flask-Large-Application-Example)
 [![Coverage Status](https://img.shields.io/coveralls/Robpol86/Flask-Large-Application-Example.svg)]
 (https://coveralls.io/r/Robpol86/Flask-Large-Application-Example)
+
+## Directory Structure
+
+TODO
+
