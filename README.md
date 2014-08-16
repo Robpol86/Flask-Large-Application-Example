@@ -17,34 +17,34 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 ## Directory Structure
 
 ```GAP
-├─ pypi_portal          # All application code in this directory.
-│  ├─ core              # Shared/misc code goes in here as packages or modules.
-│  ├─ models
+├─ pypi_portal/         # All application code in this directory.
+│  ├─ core/             # Shared/misc code goes in here as packages or modules.
+│  ├─ models/
 │  │  ├─ fruit.py       # Holds several tables about a subject.
 │  │  └─ vegetable.py
 │  │
-│  ├─ static
+│  ├─ static/
 │  │  ├─ favicon.ico
-│  │  └─ some_lib
-│  │     ├─ css
+│  │  └─ some_lib/
+│  │     ├─ css/
 │  │     │  └─ some_lib.css
-│  │     └─ js
+│  │     └─ js/
 │  │        └─ some_lib.js
 │  │
-│  ├─ tasks           # Celery tasks (packages or modules).
-│  ├─ templates       # Base templates used/included throughout the app.
+│  ├─ tasks/          # Celery tasks (packages or modules).
+│  ├─ templates/      # Base templates used/included throughout the app.
 │  │  ├─ 404.html
 │  │  └─ base.html
 │  │
-│  ├─ views
-│  │  ├─ view1
-│  │  │  ├─ templates               # Templates only used by view1.
+│  ├─ views/
+│  │  ├─ view1/
+│  │  │  ├─ templates/              # Templates only used by view1.
 │  │  │  │  └─ view1_section1.html  # Naming convention: package_module.html
 │  │  │  ├─ section1.py             # Each view module has its own blueprint.
 │  │  │  └─ section2.py
 │  │  │
-│  │  ├─ view2
-│  │  └─ view3
+│  │  ├─ view2/
+│  │  └─ view3/
 │  │
 │  ├─ application.py  # Flask create_app() factory.
 │  ├─ blueprints.py   # Define Flask blueprints and their URLs.
@@ -52,10 +52,10 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 │  ├─ extensions.py   # Instantiate SQLAlchemy, Celery, etc. Importable.
 │  └─ middleware.py   # Error handlers, template filters, other misc code.
 │
-├─ tests                    # Tests are structured similar to the application.
-│  ├─ core
+├─ tests/                   # Tests are structured similar to the application.
+│  ├─ core/
 │  │  └─ test_something.py
-│  ├─ tasks
+│  ├─ tasks/
 │  └─ conftest.py
 │
 └─ manage.py          # Main entry-point into the Flask/Celery application.

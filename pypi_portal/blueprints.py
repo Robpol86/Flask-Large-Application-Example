@@ -25,8 +25,9 @@ def _factory(partial_module_string, url_prefix):
     return blueprint
 
 
+examples_exception = _factory('examples.exception', '/examples/exception')
 home_index = _factory('home.index', '/')
 pypi_packages = _factory('pypi.packages', '/pypi')
 
 
-all_blueprints = (home_index, pypi_packages,)
+all_blueprints = (examples_exception, home_index, pypi_packages,)

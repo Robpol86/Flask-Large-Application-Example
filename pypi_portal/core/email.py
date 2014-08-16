@@ -56,14 +56,23 @@ def send_exception(subject):
     Positional arguments:
     subject -- subject line of the email (to be prepended by 'Application Error: ').
     """
-    # Get exception information.
-    tb = tbtools.get_current_traceback()
     # Generate and modify html.
+    tb = tbtools.get_current_traceback()  # Get exception information.
     with _override_html():
         html = tb.render_full().encode('utf-8', 'replace')
     html = html.replace('<blockquote>', '<blockquote style="margin: 1em 0 0; padding: 0;">')
-    # Send email.
     subject = 'Application Error: {}'.format(subject)
+
+    # Apply throttle.
+    md5 = hashlib.md5('{}{}'.format(subject, html)).hexdigest()
+    seconds = int(current_app.config['MAIL_EXCEPTION_THROTTLE'])
+    lock = redis.lock(EMAIL_THROTTLE.format(md5=md5), timeout=seconds)
+    have_lock = lock.acquire(blocking=False)
+    if not have_lock:
+        LOG.debug('Suppressing email: {}'.format(subject))
+        return
+
+    # Send email.
     msg = Message(subject=subject, recipients=current_app.config['ADMINS'], html=html)
     mail.send(msg)
 

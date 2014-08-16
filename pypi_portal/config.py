@@ -11,6 +11,7 @@ class HardCoded(object):
     ADMINS = ['me@me.test']
     DB_MODELS_IMPORTS = ('pypi',)  # Like CELERY_IMPORTS in CeleryConfig.
     ENVIRONMENT = property(lambda self: self.__class__.__name__)
+    MAIL_EXCEPTION_THROTTLE = 24 * 60 * 60
     _SQLALCHEMY_DATABASE_DATABASE = 'pypi_portal'
     _SQLALCHEMY_DATABASE_HOSTNAME = 'localhost'
     _SQLALCHEMY_DATABASE_PASSWORD = 'pypi_p@ssword'
