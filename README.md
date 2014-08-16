@@ -13,10 +13,14 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 
 ## Directory Structure
 
-```
+```GAP
 ├─ pypi_portal
 │  ├─ application.py  # Flask create_app() factory.
-│  └─ blueprints.py   # Define Flask blueprints and their URLs.
+│  ├─ blueprints.py   # Define Flask blueprints and their URLs.
+│  ├─ config.py       # All configs for Flask, Celery, Prod, Dev, etc.
+│  ├─ extensions.py   # Instantiate SQLAlchemy, Celery, etc. Importable.
+│  └─ middleware.py   # Error handlers, template filters, other misc code.
+│
 ├─ tests
 │
 └─ manage.py          # Main entry-point into the Flask/Celery application. 
