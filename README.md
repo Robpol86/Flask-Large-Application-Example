@@ -17,10 +17,10 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 ## Directory Structure
 
 ```GAP
-├─ pypi_portal        # All application code in this directory.
-│  ├─ core
+├─ pypi_portal          # All application code in this directory.
+│  ├─ core              # Shared/misc code goes in here as packages or modules.
 │  ├─ models
-│  │  ├─ fruit.py
+│  │  ├─ fruit.py       # Holds several tables about a subject.
 │  │  └─ vegetable.py
 │  │
 │  ├─ static
@@ -31,7 +31,7 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 │  │     └─ js
 │  │        └─ some_lib.js
 │  │
-│  ├─ tasks
+│  ├─ tasks           # Celery tasks (packages or modules).
 │  ├─ templates       # Base templates used/included throughout the app.
 │  │  ├─ 404.html
 │  │  └─ base.html
@@ -53,7 +53,11 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 │  ├─ extensions.py   # Instantiate SQLAlchemy, Celery, etc. Importable.
 │  └─ middleware.py   # Error handlers, template filters, other misc code.
 │
-├─ tests
+├─ tests                    # Tests are structured similar to the application.
+│  ├─ core
+│  │  └─ test_something.py
+│  ├─ tasks
+│  └─ conftest.py
 │
 └─ manage.py          # Main entry-point into the Flask/Celery application. 
 ```
