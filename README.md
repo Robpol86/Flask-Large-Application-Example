@@ -14,7 +14,26 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 ## Directory Structure
 
 ```GAP
-├─ pypi_portal
+├─ pypi_portal        # All application code in this directory.
+│  ├─ core
+│  ├─ models
+│  ├─ static
+│  ├─ tasks
+│  ├─ templates       # Base templates used/included throughout the app.
+│  │  ├─ 404.html
+│  │  └─ base.html
+│  │
+│  ├─ views
+│  │  ├─ view1
+│  │  │  ├─ templates               # Templates only used by view1.
+│  │  │  │  └─ view1_section1.html
+│  │  │  │
+│  │  │  ├─ section1.py             # Each view module has its own blueprint.
+│  │  │  └─ section2.py
+│  │  │
+│  │  ├─ view2
+│  │  └─ view3
+│  │
 │  ├─ application.py  # Flask create_app() factory.
 │  ├─ blueprints.py   # Define Flask blueprints and their URLs.
 │  ├─ config.py       # All configs for Flask, Celery, Prod, Dev, etc.
