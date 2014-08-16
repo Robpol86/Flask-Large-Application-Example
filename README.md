@@ -61,7 +61,13 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 └─ manage.py          # Main entry-point into the Flask/Celery application. 
 ```
 
-## Blueprints
+## Features
+
+TODO
+
+## Design Choices
+
+### Blueprints
 
 The first thing you may notice are where blueprints are defined. Flask applications usually define their blueprints
 inside view modules themselves, and must be imported in or after create_app(). URLs for blueprints are usually set in or
@@ -75,7 +81,7 @@ Instead I define blueprints in `blueprints.py` and import them in both views and
 "centralize" URL and module specifications in blueprints.py instead of having those two pieces of information in views
 and `application.py`.
 
-## Templates
+### Templates
 
 This is another deviation from usual Flask applications. Instead of dumping all templates used by all views into one
 directory, I split it up into two classes: "common" and "per-view". This makes it way easier to determine which view a
@@ -91,14 +97,14 @@ though: Flask flattens the template's directory structure into one directory. `t
 formatted as packageName_moduleName.html (where packageName is my_view). When modules have a lot of templates just
 append to the filename (e.g. packageName_moduleName_feature.html).
 
-## Extensions
+### Extensions
 
 This isn't very unique but I'll cover it anyway. I've seen other projects follow this convention. The idea is to
-instantiate extensions such as SQLAlchemy here, but without any arguments (and without calling init_app()).
+instantiate extensions such as SQLAlchemy here, but without any arguments (and without calling `init_app()`).
 
-These may be imported by views/tasks and are also imported by `application.py` which is where init_app() is called.
+These may be imported by views/tasks and are also imported by `application.py` which is where `init_app()` is called.
 
-## Config
+### Config
 
 I elected to keep all configurations in this one file, instead of having different files for different environments
 (prod, stage, dev, etc). One important note is I also keep non-Flask configurations in the same file (e.g. Celery,
