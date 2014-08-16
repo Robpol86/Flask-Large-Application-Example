@@ -75,8 +75,8 @@ Some features I've included in this demo application are:
 ### Blueprints
 
 The first thing you may notice are where blueprints are defined. Flask applications usually define their blueprints
-inside view modules themselves, and must be imported in or after create_app(). URLs for blueprints are usually set in or
-after create_app() as well.
+inside view modules themselves, and must be imported in or after `create_app()`. URLs for blueprints are usually set in
+or after `create_app()` as well.
 
 I never liked defining blueprints in the views since according to pep8 the variables should be IN_ALL_CAPS (it's true
 that blueprints are still module-level in `blueprints.py` but since that file is 99% module-level variables I make a
