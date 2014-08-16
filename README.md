@@ -1,8 +1,11 @@
 # Flask-Large-Application-Example
 
-PyPI Portal is a small demo app used as an example of a potentially large Flask application with several views and Celery tasks. This is how I structure my large Flask applications. In this README I'll explain my design choices with several aspects of the project.
+PyPI Portal is a small demo app used as an example of a potentially large Flask application with several views and
+Celery tasks. This is how I structure my large Flask applications. In this README I'll explain my design choices with
+several aspects of the project.
 
-For information on how to deploy this application to different production environments, visit [the project's wiki](https://github.com/Robpol86/Flask-Large-Application-Example/wiki).
+For information on how to deploy this application to different production environments, visit
+[the project's wiki](https://github.com/Robpol86/Flask-Large-Application-Example/wiki).
 
 For a demo of this application running in the cloud, visit http://ec2-54-213-40-230.us-west-2.compute.amazonaws.com/.
 
@@ -17,7 +20,17 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 ├─ pypi_portal        # All application code in this directory.
 │  ├─ core
 │  ├─ models
+│  │  ├─ fruit.py
+│  │  └─ vegetable.py
+│  │
 │  ├─ static
+│  │  ├─ favicon.ico
+│  │  └─ some_lib
+│  │     ├─ css
+│  │     │  └─ some_lib.css
+│  │     └─ js
+│  │        └─ some_lib.js
+│  │
 │  ├─ tasks
 │  ├─ templates       # Base templates used/included throughout the app.
 │  │  ├─ 404.html
@@ -26,7 +39,7 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 │  ├─ views
 │  │  ├─ view1
 │  │  │  ├─ templates               # Templates only used by view1.
-│  │  │  │  └─ view1_section1.html
+│  │  │  │  └─ view1_section1.html  # Naming convention: package_module.html
 │  │  │  │
 │  │  │  ├─ section1.py             # Each view module has its own blueprint.
 │  │  │  └─ section2.py
