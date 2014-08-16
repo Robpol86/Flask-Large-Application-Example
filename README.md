@@ -40,7 +40,6 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 │  │  ├─ view1
 │  │  │  ├─ templates               # Templates only used by view1.
 │  │  │  │  └─ view1_section1.html  # Naming convention: package_module.html
-│  │  │  │
 │  │  │  ├─ section1.py             # Each view module has its own blueprint.
 │  │  │  └─ section2.py
 │  │  │
