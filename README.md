@@ -13,5 +13,11 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 
 ## Directory Structure
 
-TODO
-
+```
+├─ pypi_portal
+│  ├─ application.py  # Flask create_app() factory.
+│  └─ blueprints.py   # Define Flask blueprints and their URLs.
+├─ tests
+│
+└─ manage.py          # Main entry-point into the Flask/Celery application. 
+```
