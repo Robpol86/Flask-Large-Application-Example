@@ -21,8 +21,8 @@ def test_testing_mode():
 
 
 def test_index_200():
-    """Makes sure the front page returns HTTP 200.
-
-    A very basic test, if the front page is broken, something has obviously failed.
-    """
-    assert '200 OK' == current_app.test_client().get('/').status
+    """Makes sure most views return HTTP 200 or 302."""
+    rules = {r.rule for r in current_app.url_map.iter_rules()
+             if 'GET' in r.methods and len(r.defaults or []) >= len(r.arguments) and r.rule != '/examples/exception/'}
+    for url in rules:
+        assert current_app.test_client().get(url).status in ('200 OK', '302 FOUND')
