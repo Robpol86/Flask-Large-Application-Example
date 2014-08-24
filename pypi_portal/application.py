@@ -42,8 +42,8 @@ def get_config(config_class_string, yaml_files=None):
         definition.update(task=celery_fmt.format(definition['task']))
     if getattr(config_obj, 'DB_MODELS_IMPORTS', False):
         config_obj.DB_MODELS_IMPORTS = [db_fmt.format(m) for m in config_obj.DB_MODELS_IMPORTS]
-    for script_name, script_file in getattr(config_obj, 'REDIS_SCRIPTS', dict()).items():
-        config_obj.REDIS_SCRIPTS[script_name] = os.path.join(REDIS_SCRIPTS_FOLDER, script_file)
+    #for script_name, script_file in getattr(config_obj, 'REDIS_SCRIPTS', dict()).items():
+    #    config_obj.REDIS_SCRIPTS[script_name] = os.path.join(REDIS_SCRIPTS_FOLDER, script_file)
 
     # Load additional configuration settings.
     yaml_files = yaml_files or [f for f in [
