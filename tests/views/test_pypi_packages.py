@@ -1,6 +1,7 @@
 from flask import current_app
 from flask.ext.celery import CELERY_LOCK
 import pytest
+from redis.exceptions import LockError
 
 from pypi_portal.extensions import db, redis
 from pypi_portal.models.pypi import Package
@@ -63,7 +64,10 @@ def test_sync_parallel(alter_xmlrpc):
     actual = db.session.query(Package.name, Package.summary, Package.latest_version).all()
     assert expected == actual
 
-    lock.release()
+    try:
+        lock.release()
+    except LockError:
+        pass
 
 
 def test_sync_many(alter_xmlrpc):
