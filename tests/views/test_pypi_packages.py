@@ -1,9 +1,17 @@
 from flask import current_app
 from flask.ext.celery import CELERY_LOCK
+import pytest
 
 from pypi_portal.extensions import db, redis
 from pypi_portal.models.pypi import Package
 from pypi_portal.models.redis import POLL_SIMPLE_THROTTLE
+from pypi_portal.tasks import pypi
+
+
+class FakeDelay(object):
+    @staticmethod
+    def ready():
+        return False
 
 
 def test_index():
@@ -77,3 +85,32 @@ def test_sync_many(alter_xmlrpc):
     ]
     actual = db.session.query(Package.name, Package.summary, Package.latest_version).all()
     assert sorted(expected) == sorted(actual)
+
+
+def test_sync_unhandled_exception():
+    old_throttle = pypi.THROTTLE
+    pypi.THROTTLE = 'nan'
+    redis.delete(POLL_SIMPLE_THROTTLE)
+
+    with pytest.raises(ValueError):
+        current_app.test_client().get('/pypi/sync').status()
+
+    pypi.THROTTLE = old_throttle
+
+
+def test_sync_timeout():
+    old_delay = pypi.update_package_list.delay
+    pypi.update_package_list.delay = FakeDelay
+    redis.delete(POLL_SIMPLE_THROTTLE)
+
+    assert '302 FOUND' == current_app.test_client().get('/pypi/sync').status
+
+    expected = [
+        ('packageB', 'Test package.', '3.0.0'), ('packageB1', 'Test package.', '3.0.0'),
+        ('packageB2', 'Test package.', '3.0.0'), ('packageB3', 'Test package.', '3.0.0'),
+        ('packageB4', 'Test package.', '3.0.0'), ('packageB5', 'Test package.', '3.0.0'),
+    ]
+    actual = db.session.query(Package.name, Package.summary, Package.latest_version).all()
+    assert sorted(expected) == sorted(actual)
+
+    pypi.update_package_list.delay = old_delay
