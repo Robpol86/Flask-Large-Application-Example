@@ -44,6 +44,7 @@ def celery_error_handler(sender, exception, **_):
 
 
 # Setup default error templates.
+@current_app.errorhandler(400)
 @current_app.errorhandler(403)
 @current_app.errorhandler(404)
 @current_app.errorhandler(500)
