@@ -14,13 +14,6 @@ LOG = getLogger(__name__)
 THROTTLE = 1 * 60 * 60
 
 
-def query(url='https://pypi.python.org/pypi'):
-    """Simply calls and returns xmlrpclib.ServerProxy().search. This is its own function for testing."""
-    client = xmlrpclib.ServerProxy(url)
-    results = client.search(dict(summary=''))
-    return results
-
-
 @celery.task(bind=True, soft_time_limit=120)
 @single_instance
 def update_package_list():
@@ -43,7 +36,8 @@ def update_package_list():
         return None
 
     # Query API.
-    results = query()
+    client = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
+    results = client.search(dict(summary=''))
     if not results:
         LOG.error('Reply from API had no results.')
         return list()

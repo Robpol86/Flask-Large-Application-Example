@@ -67,7 +67,7 @@ from tornado import httpserver, ioloop, web, wsgi
 from pypi_portal.application import create_app, get_config
 from pypi_portal.extensions import db
 
-OPTIONS = docopt(__doc__)
+OPTIONS = docopt(__doc__) if __name__ == '__main__' else dict()
 
 
 class CustomFormatter(logging.Formatter):
