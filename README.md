@@ -14,6 +14,17 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 [![Coverage Status](https://img.shields.io/coveralls/Robpol86/Flask-Large-Application-Example.svg)]
 (https://coveralls.io/r/Robpol86/Flask-Large-Application-Example)
 
+## Features
+
+Some features I've included in this demo application are:
+
+* Tests are written for [pytest](http://pytest.org/).
+* Tasks/scripts/jobs are supported with [Celery](http://www.celeryproject.org/).
+* Any unhandled exceptions raised in views or Celery tasks are emailed to you from your production instance. The email
+  is styled to look similar to the exceptions shown in development environments, but without the interactive console.
+* Message flashing is "powered by" [Bootstrap Growl](https://github.com/mouse0270/bootstrap-growl) and I've also
+  included Bootstrap Modals and Wells as flashed message containers. More about that in `core/flash.py`.
+
 ## Directory Structure
 
 ```GAP
@@ -60,15 +71,6 @@ For a demo of this application running in the cloud, visit http://ec2-54-213-40-
 │
 └─ manage.py          # Main entry-point into the Flask/Celery application.
 ```
-
-## Features
-
-Some features I've included in this demo application are:
-
-* Any unhandled exceptions raised in views or Celery tasks are emailed to you from your production instance. The email
-  is styled to look similar to the exceptions shown in development environments, but without the interactive console.
-* Message flashing is "powered by" [Bootstrap Growl](https://github.com/mouse0270/bootstrap-growl) and I've also
-  included Bootstrap Modals and Wells as flashed message containers. More about that in `core/flash.py`.
 
 ## Design Choices
 
