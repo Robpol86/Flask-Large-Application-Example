@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div id="body_container" class='container'>
+        <div class="page-header">
+            <h1>Flask Flash Fun-House</h1>
+        </div>
+
+        <form class="form-horizontal" role="form" method="get" action="{{ url_for('.modal') }}">
+            <div class="form-group">
+                <div class="col-sm-8 well well-sm" id="message-size-well"> <!-- well -->
+                    <label class="col-sm-3 control-label">Message Size:</label>
+
+                    <label class="col-sm-3 control-label">
+                        <input type="radio" name="message_size" id="smallMessage" value="small" checked> Small
+                    </label>
+
+                    <label class="col-sm-3 control-label">
+                        <input type="radio" name="message_size" id="mediumMessage" value="medium"> Medium
+                    </label>
+
+                    <label class="col-sm-3 control-label">
+                        <input type="radio" name="message_size" id="largeMessage" value="large"> Large
+                    </label>
+                </div> <!-- /well -->
+
+                <div class="col-sm-1"></div>
+
+                <div class="col-sm-3 well well-sm" id="flash-count-well"> <!-- other-well -->
+                    <label class="control-label">
+                        Flash Count:
+                        <select name="flash_count">
+                            {% for i in range(1,11) %}
+                                <option>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div> <!-- /other-well -->
+            </div>
+
+            <br>
+
+            <div class="form-group">
+                <div class="col-sm-3">
+                    <button type="submit" class="btn btn-block btn-success" name="flash_type" value="success">
+                        Success
+                    </button>
+                </div>
+                <div class="col-sm-3">
+                    <button type="submit" class="btn btn-block btn-info" name="flash_type" value="info">
+                        Info
+                    </button>
+                </div>
+                <div class="col-sm-3">
+                    <button type="submit" class="btn btn-block btn-warning" name="flash_type" value="warning">
+                        Warning
+                    </button>
+                </div>
+                <div class="col-sm-3">
+                    <button type="submit" class="btn btn-block btn-danger" name="flash_type" value="danger">
+                        Danger
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-block btn-default" name="flash_type" value="default">
+                        Default
+                    </button>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-block" name="flash_type" value="well">
+                        Well
+                    </button>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-block" name="flash_type" value="modal">
+                        Modal
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <style type="text/css">
+        #body_container {
+            width: auto;
+            max-width: 960px;
+            padding: 0 15px;
+        }
+
+        #message-size-well > label {
+            text-align: left!important;
+        }
+
+        #flash-count-well {
+            text-align: center;
+        }
+    </style>
+{% endblock %}

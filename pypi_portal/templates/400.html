@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block append_title %} - HTTP 400{% endblock %}
+
+{% block container %}
+    <div class="jumbotron">
+        <h1>400 Bad Request</h1>
+        <p class="lead">Page found but the POST/GET data sent was invalid.</p>
+        <p>URL: {{ request.url }}</p>
+    </div>
+{% endblock %}
