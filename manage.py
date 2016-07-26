@@ -254,10 +254,10 @@ def create_all():
     app = create_app(parse_options())
     log = logging.getLogger(__name__)
     with app.app_context():
-        tables_before = {t[0] for t in db.session.execute('SHOW TABLES')}
+        tables_before = db.engine.table_name()
         db.create_all()
-        tables_after = {t[0] for t in db.session.execute('SHOW TABLES')}
-    created_tables = tables_after - tables_before
+        tables_after = db.engine.table_name()
+    created_tables = set(tables_after) - set(tables_before)
     for table in created_tables:
         log.info('Created table: {}'.format(table))
 
